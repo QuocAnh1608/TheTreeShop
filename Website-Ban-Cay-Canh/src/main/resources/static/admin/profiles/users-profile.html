@@ -1,0 +1,50 @@
+<section class="section">
+  <div class="row">
+    <div class="">
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Profile</h5>
+          <div>
+            <table class="table">
+              <thead>
+              <tr>
+                <th> ID</th>
+                <th>Fullname</th>
+                <th>Avatar</th>
+                <th>Gender</th>
+                <th>Birthday</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+				<th>Edit</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="item in items">
+                <td>{{item.id}}</td>
+                <td>{{item.fullname}}</td>
+                <td><img ng-src="{{'../img/avatar/' + item.avatar}}" class="size-img" alt="No Image"></td>
+                <td>{{item.gender?'Nam':'Nữ'}}</td>
+                <td>{{item.birthday}}</td>
+                <td>{{item.email}}</td>
+                <td>{{item.phone}}</td>
+                <td>{{item.address}}</td>
+
+                <td>
+                  <div class="quick_view"><i class="bi bi-eye"></i><button ng-click="edit(item)">View</button></div>
+                </td>
+
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
