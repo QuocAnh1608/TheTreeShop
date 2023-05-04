@@ -13,12 +13,19 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.Data;
 
 @SuppressWarnings("serial")
 @Data
 @Entity
 @Table(name = "Product_Rate")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
 public class ProductRate implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +41,9 @@ public class ProductRate implements Serializable {
 	private Profile user;
 
 	// product_id
-	@ManyToOne
-	@JoinColumn(name = "product_id")
-	private Product product;
+	private Integer product_id;
+//	@JsonIgnore
+//	@ManyToOne
+//	@JoinColumn(name = "product_id")
+//	private Product product;
 }

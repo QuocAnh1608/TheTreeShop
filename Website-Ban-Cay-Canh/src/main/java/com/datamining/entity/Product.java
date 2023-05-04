@@ -1,35 +1,35 @@
 package com.datamining.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.*;
-
 import com.datamining.DTO.ProductDTO;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
+import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.var;
+import org.springframework.security.core.Transient;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 @SuppressWarnings("serial")
 @Data
 @Entity
 @Table(name = "Products")
-@JsonIgnoreProperties({"likes"})
+@JsonIgnoreProperties({"likes", "productRates"})
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
 public class Product implements Serializable {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
+	@NotNull
 	private Double price;
-	private Double quantity;
+	@NotNull
+	private Integer quantity;
+	@NotNull
 	private String image;
 	private String description;
 	private Boolean status;
@@ -64,15 +64,18 @@ public class Product implements Serializable {
 	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
 	private List<OrderDetail> oderDetails;
 
-	// Product_Rate
-	@JsonIgnore
-	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-	private List<ProductRate> productRates;
+//	// Product_Rate
+//	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+//	private List<ProductRate> productRates;
 
 	// Product_Size
-	@JsonIgnore
+	@JsonManagedReference
 	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-	private Set<ProductSize> ratings;
+	private List<ProductSize> productSizes;
+
+	public Product() {
+
+	}
 
 
 	public static Product convert(ProductDTO productDTO) {

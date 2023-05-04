@@ -1,6 +1,5 @@
 package com.datamining;
 
-import com.datamining.entity.Product;
 import com.datamining.service.CategoryService;
 import com.datamining.service.ProductService;
 import com.datamining.utils.StringUtils;
@@ -18,27 +17,26 @@ public class WebsiteBanCayCanhApplication {
     }
 
 
+    @Bean
+    CommandLineRunner run(ProductService productService) {
+        return args -> {
+            var products = productService.findAll();
+            products.forEach(p -> {
+                String name = p.getName();
+                String nameEn = StringUtils.removeAccent(name);
+                nameEn = nameEn.toLowerCase();
+                String urlSlug = nameEn.replaceAll(" ", "-");
+                String urlHtml = urlSlug + ".html";
+                p.setUrl(urlHtml);
+                productService.save(p);
+            });
 
-//    @Bean
-//    CommandLineRunner run(ProductService productService) {
-//        return args -> {
-//            var products = productService.findAll();
-//            products.forEach(p -> {
-//                String name = p.getName();
-//                String nameEn = StringUtils.removeAccent(name);
-//                nameEn = nameEn.toLowerCase();
-//                String urlSlug = nameEn.replaceAll(" ", "-");
-//                String urlHtml = urlSlug + ".html";
-//                p.setUrl(urlHtml);
-//                productService.save(p);
-//            });
-//
-//            var product = productService.findByUrlEquals("npk-20-10-15+-te");
-//            System.out.println(product);
-//
-//
-//        };
-//    }
+            var product = productService.findByUrlEquals("npk-20-10-15+-te");
+            System.out.println(product);
+
+
+        };
+    }
 
 //    @Bean
 //    CommandLineRunner run(CategoryService categoryService) {

@@ -1,44 +1,49 @@
 package com.datamining.controller;
 
 
-import com.datamining.service.ProductService;
-
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-
-import com.datamining.service.ProfileService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-
-import org.springframework.web.bind.annotation.*;
-
-
-import com.datamining.dao.ProfileDAO;
 import com.datamining.entity.Account;
 import com.datamining.entity.Product;
-import com.datamining.entity.Profile;
 import com.datamining.service.AccountService;
+import com.datamining.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
 
 
 @Controller
 public class HomeController {
 	@Autowired
-	ProductService pService;
-	@Autowired
-	AccountService dao;
+	AccountService aService;
 	
-	@RequestMapping({"/", "/home/index"})
-	public String home(Model model) {
-//		List<Category> sp = dao.findAll();
-//		model.addAttribute("items",sp);
-		List<Product> list = pService.findAll();
+	@Autowired
+	ProductService pService;
+
+	
+	@RequestMapping({"/", "/home"})
+	public String home(Model model, HttpServletRequest req,
+					   @RequestParam("page") Optional<Integer> page) {
+		Pageable pageable = PageRequest.of(page.orElse(0), 6); // 6 product/1 page
+
+		Page<Product> list = pService.findAllByPage(pageable);
 		model.addAttribute("items", list);
 		List<Product> bestSale = pService.findTop5Seller();
 		model.addAttribute("bestSale", bestSale);
+
+		if(req.getRemoteUser() != null) {
+			Account us = aService.findByTk(req.getRemoteUser());
+			int usId = us.getId();
+			model.addAttribute("user_id", usId);
+		}
 		return "user/layout/index";
 	}
 	
@@ -49,34 +54,55 @@ public class HomeController {
 	}
 	
 	@GetMapping("/account/info")
-	public String account_info(Model model,HttpServletRequest respon)
+	public String account_info(Model model,HttpServletRequest req)
 	{
-		if(respon.getRemoteUser() == null)
+		if(req.getRemoteUser() == null)
 		{
 			return "redirect:/login/form";
 		}else {
-			Account us = dao.findByTk(respon.getRemoteUser());
-//			System.out.println(us.getId());
+			Account us = aService.findByTk(req.getRemoteUser());
 			int usId = us.getId();
 			model.addAttribute("user_id", usId);
 			return "user/security/my-account";
 		}
 	}
+	
+	@GetMapping("/account/order-detail")
+	public String order_detail(Model model, @RequestParam("id") Integer idOrder,HttpServletRequest req)
+	{
+		if(req.getRemoteUser() == null)
+		{
+			return "redirect:/login/form";
+		}else {
+			Account us = aService.findByTk(req.getRemoteUser());
+			int usId = us.getId();
+			model.addAttribute("user_id", usId);
+			return "user/security/order-detail";
+		}
+	}
 
 	@RequestMapping("/cart/detail")
-	public String cart_detail()
+	public String cart_detail(Model model,HttpServletRequest req)
 	{
+		model.addAttribute("sale",0);
+		if(req.getRemoteUser() != null) {
+			Account us = aService.findByTk(req.getRemoteUser());
+			int usId = us.getId();
+			model.addAttribute("user_id", usId);
+		} else {
+			return "redirect:/login/form";
+		}
 		return "user/cart/cart-detail";
 	}
 	
 
 	
 	@RequestMapping("/account/Qrcode")
-	public String account_qrCode(Model model,HttpServletRequest respon)
+	public String account_qrCode(Model model,HttpServletRequest req)
 	{
 
-		String username = respon.getRemoteUser();
-		Account us = dao.findByTk(username);
+		String username = req.getRemoteUser();
+		Account us = aService.findByTk(username);
 		String tk = us.getUsername();
 		String pass = us.getPassword();
 		model.addAttribute("username",tk);
@@ -86,9 +112,23 @@ public class HomeController {
 	}
 	
 	@RequestMapping("/wishlist")
-	public String product_wish()
+	public String product_wish(Model model, HttpServletRequest req)
 	{
-		return "user/product/wishlist";
+		if(req.getRemoteUser() == null)
+		{
+			return "redirect:/login/form";
+		}else {
+			Account us = aService.findByTk(req.getRemoteUser());
+			int usId = us.getId();
+			model.addAttribute("user_id", usId);
+			return "user/product/wishlist";
+		}
+	}
+	
+	@RequestMapping("/register")
+	public String register()
+	{
+		return "user/security/register";
 	}
 	
 	@RequestMapping("/admin")
@@ -98,7 +138,7 @@ public class HomeController {
 		{
 			return "redirect:/login/form";
 		}else {
-			Account us = dao.findByTk(respon.getRemoteUser());
+			Account us = aService.findByTk(respon.getRemoteUser());
 			int usId = us.getId();
 			model.addAttribute("user_id", usId);
 			return "../static/admin/index";

@@ -108,9 +108,8 @@ function myf() {
 var popViews = document.querySelectorAll('.popup-view');
 var popupBtns = document.querySelectorAll('.popup-btn');
 var closeBtns = document.querySelectorAll('.close-btn');
-
-var popup = function (popClick) {
-    popViews[popClick].classList.add('active');
+var popup = function (click) {
+    popViews[click].classList.add('active');
 }
 
 popupBtns.forEach((popupBtns, i) => {
@@ -126,6 +125,7 @@ closeBtns.forEach((closeBtns) => {
         })
     })
 })
+
 
 window.addEventListener('scroll', reveal);
 
@@ -144,39 +144,39 @@ function reveal() {
     }
 }
 
-window.addEventListener('scroll', gooey);
+// window.addEventListener('scroll', gooey);
+//
+// function gooey() {
+//     var gooeys = document.querySelectorAll('.gooey');
+//     for (var i = 0; i < gooeys.length; i++) {
+//         var windowheight = window.innerHeight;
+//         var gooeytop = gooeys[i].getBoundingClientRect().top;
+//         var gooeypoint = 120;
+//
+//         if (gooeytop < windowheight - gooeypoint) {
+//             gooeys[i].classList.add('active');
+//         } else {
+//             gooeys[i].classList.remove('active');
+//         }
+//     }
+// }
 
-function gooey() {
-    var gooeys = document.querySelectorAll('.gooey');
-    for (var i = 0; i < gooeys.length; i++) {
-        var windowheight = window.innerHeight;
-        var gooeytop = gooeys[i].getBoundingClientRect().top;
-        var gooeypoint = 120;
-
-        if (gooeytop < windowheight - gooeypoint) {
-            gooeys[i].classList.add('active');
-        } else {
-            gooeys[i].classList.remove('active');
-        }
-    }
-}
-
-window.addEventListener('scroll', content);
-
-function content() {
-    var contents = document.querySelectorAll('.content');
-    for (var i = 0; i < contents.length; i++) {
-        var windowheight = window.innerHeight;
-        var gooeytop = contents[i].getBoundingClientRect().top;
-        var gooeypoint = 120;
-
-        if (gooeytop < windowheight - gooeypoint) {
-            contents[i].classList.add('content_hover');
-        } else {
-            contents[i].classList.remove('content_hover');
-        }
-    }
-}
+// window.addEventListener('scroll', content);
+//
+// function content() {
+//     var contents = document.querySelectorAll('.content');
+//     for (var i = 0; i < contents.length; i++) {
+//         var windowheight = window.innerHeight;
+//         var gooeytop = contents[i].getBoundingClientRect().top;
+//         var gooeypoint = 120;
+//
+//         if (gooeytop < windowheight - gooeypoint) {
+//             contents[i].classList.add('content_hover');
+//         } else {
+//             contents[i].classList.remove('content_hover');
+//         }
+//     }
+// }
 
 // function submitForm() {
 //     document.getElementById("bwp_form_filter_product").submit();
@@ -195,6 +195,27 @@ $(document).ready(function ($) {
             success: function (data) {
                 // Update the product items container with the new data
                 $('#product__items').html($(data).find('#product__items').html());
+
+                var popViews = document.querySelectorAll('.popup-view');
+                var popupBtns = document.querySelectorAll('.popup-btn');
+                var closeBtns = document.querySelectorAll('.close-btn');
+                var popup = function (click) {
+                    popViews[click].classList.add('active');
+                }
+
+                popupBtns.forEach((popupBtns, i) => {
+                    popupBtns.addEventListener("click", () => {
+                        popup(i);
+                    })
+                })
+
+                closeBtns.forEach((closeBtns) => {
+                    closeBtns.addEventListener("click", () => {
+                        popViews.forEach((popViews) => {
+                            popViews.classList.remove('active');
+                        })
+                    })
+                })
             }
         });
         //change url without reloading page
@@ -204,10 +225,11 @@ $(document).ready(function ($) {
 
     $('#bwp_form_filter_product').submit(function(e) {
         e.preventDefault(); // Prevents the form from submitting normally
+
         var url = $(this).attr('action'); // Gets the URL from the data-url attribute
         var formData = $(this).serialize(); // Serializes the form data
         $.ajax({
-            type: 'POST',
+            type: 'GET',
             url: url,
             data: formData,
             success: function(data) {
@@ -215,12 +237,37 @@ $(document).ready(function ($) {
                 // Replaces the contents of #product__items with the response data
             }
         });
-        window.history.pushState("", "", categoryUrl);
+        window.history.pushState("", "",  url);
+    });
+
+    $(document).on('click', '.page-link', function (event) {
+        event.preventDefault();
+        var url = $(this).attr('href')
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+                $('#product__items').html($(data).find('#product__items').html());
+            }
+
+        })
+        window.history.pushState("", "", url);
     });
 });
 
+$("#scrolls-top").click(function() {
+    $('html, body').animate({
+        scrollTop: $("#top").offset().top
+    }, 0);
+});
 
 
+$('#scroll-items').click(function() {
+    $('html, body').animate({
+        scrollTop: eval($('#' + $(this).attr('target')).offset().top - 70)
+    }, 0);
+});
 
 
 

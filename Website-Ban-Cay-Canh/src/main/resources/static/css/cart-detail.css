@@ -30,6 +30,7 @@
     border-right: 1px solid #e1e1e1;
     text-align: center;
     padding: 10px;
+    line-height: 90px;
 } 
 .table>table>tbody td.product_remove {
     min-width: 100%;
@@ -62,8 +63,7 @@
 .table>table>tbody td.product-price {
     min-width: 130px;
     color: #222222;
-    font-size: 16px;
-    font-weight: 900;
+    font-size: 14px;
     font-family: "Roboto";
 }
 
@@ -80,9 +80,9 @@
     font-size: 14px;
 }
 .table>table>tbody td.product_total {
-    font-weight: 900;
-    font-size: 14px;
+    font-weight: 700;
     font-family: "Roboto";
+    font-size: 14px;
 }
 
 .cart_submit {
